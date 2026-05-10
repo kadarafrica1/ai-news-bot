@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Daily News</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink:    #0d0d0d;
+    --paper:  #f5f0e8;
+    --accent: #b5262b;
+    --muted:  #6b6560;
+    --rule:   #2a2a2a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'Source Serif 4', Georgia, serif;
+    font-size: 18px;
+    line-height: 1.7;
+  }
+
+  /* ── Masthead ─────────────────────────────────────────────────────────── */
+  header {
+    border-bottom: 3px double var(--rule);
+    padding: 2rem 0 1rem;
+    text-align: center;
+  }
+  header .edition {
+    font-size: .75rem;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: .5rem;
+  }
+  header h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2.4rem, 6vw, 5rem);
+    font-weight: 900;
+    letter-spacing: -.02em;
+    line-height: 1;
+  }
+  header .tagline {
+    font-style: italic;
+    color: var(--muted);
+    font-size: .9rem;
+    margin-top: .4rem;
+  }
+  header .rule-bar {
+    height: 1px;
+    background: var(--rule);
+    margin-top: 1rem;
+  }
+
+  /* ── Layout ───────────────────────────────────────────────────────────── */
+  main {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  /* ── Hero article ─────────────────────────────────────────────────────── */
+  .hero {
+    border-bottom: 2px solid var(--rule);
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    opacity: 0;
+    animation: fadeUp .6s ease forwards;
+  }
+  .hero img {
+    width: 100%;
+    height: 420px;
+    object-fit: cover;
+    display: block;
+    margin-bottom: 1.2rem;
+    border: 1px solid #ccc;
+  }
+  .hero .kicker {
+    font-size: .72rem;
+    letter-spacing: .18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-family: 'Playfair Display', serif;
+    font-weight: 700;
+    margin-bottom: .3rem;
+  }
+  .hero h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.8rem, 4vw, 2.8rem);
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: .8rem;
+  }
+  .hero .meta {
+    font-size: .78rem;
+    color: var(--muted);
+    letter-spacing: .05em;
+    margin-bottom: .8rem;
+  }
+  .hero p { font-weight: 300; }
+  .hero a.read-more {
+    display: inline-block;
+    margin-top: .9rem;
+    font-size: .8rem;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+    padding-bottom: 1px;
+  }
+
+  /* ── Archive grid ─────────────────────────────────────────────────────── */
+  .archive { display: grid; grid-template-columns: 1fr; gap: 1.8rem; }
+
+  @media(min-width: 600px) {
+    .archive { grid-template-columns: 1fr 1fr; }
+  }
+
+  .card {
+    border-top: 1px solid var(--rule);
+    padding-top: 1.1rem;
+    opacity: 0;
+    animation: fadeUp .5s ease forwards;
+  }
+  .card img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+    border: 1px solid #ccc;
+    margin-bottom: .8rem;
+  }
+  .card h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 1.15rem;
+    font-weight: 700;
+    line-height: 1.3;
+    margin-bottom: .4rem;
+  }
+  .card .meta { font-size: .72rem; color: var(--muted); margin-bottom: .4rem; }
+  .card p { font-size: .9rem; font-weight: 300; color: #333; }
+  .card a.read-more {
+    display: inline-block;
+    margin-top: .6rem;
+    font-size: .72rem;
+    letter-spacing: .1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    border-bottom: 1px solid var(--accent);
+  }
+
+  /* ── Footer ───────────────────────────────────────────────────────────── */
+  footer {
+    text-align: center;
+    padding: 2rem;
+    font-size: .75rem;
+    color: var(--muted);
+    border-top: 1px solid #ccc;
+  }
+
+  @keyframes fadeUp {
+    from { opacity:0; transform:translateY(16px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* stagger cards */
+  .card:nth-child(1) { animation-delay: .05s; }
+  .card:nth-child(2) { animation-delay: .12s; }
+  .card:nth-child(3) { animation-delay: .19s; }
+  .card:nth-child(4) { animation-delay: .26s; }
+  .card:nth-child(5) { animation-delay: .33s; }
+  .card:nth-child(n+6) { animation-delay: .4s; }
+</style>
+</head>
+<body>
+
+<header>
+  <p class="edition">Powered by AI · Published daily at 8 PM</p>
+  <h1>AI Daily News</h1>
+  <p class="tagline">The world's most important stories, curated by artificial intelligence</p>
+  <div class="rule-bar"></div>
+</header>
+
+<main>
+  <div id="hero-container"></div>
+  <section class="archive" id="archive"></section>
+</main>
+
+<footer>
+  <p>Content curated automatically from Al Jazeera, BBC, CNN, NBC, Reuters, AP &amp; more.</p>
+  <p>Updated daily at 20:00 UTC. AI-generated summaries — always read the original source.</p>
+</footer>
+
+<script>
+  const fmt = iso => new Date(iso).toLocaleDateString("en-US", {
+    weekday: "long", year: "numeric", month: "long", day: "numeric"
+  });
+
+  async function loadFeed() {
+    let feed = [];
+    try {
+      const r = await fetch("feed.json");
+      feed = await r.json();
+    } catch {
+      document.getElementById("hero-container").innerHTML =
+        "<p style='color:#888;padding:2rem 0'>No articles yet — the bot will post tonight at 8 PM UTC.</p>";
+      return;
+    }
+
+    if (!feed.length) return;
+
+    // Hero (latest entry)
+    const h = feed[0];
+    document.getElementById("hero-container").innerHTML = `
+      <article class="hero">
+        ${h.image ? `<img src="${h.image}" alt="${h.headline}">` : ""}
+        <p class="kicker">Top Story · ${fmt(h.date)}</p>
+        <h2>${h.headline}</h2>
+        <p class="meta">${new Date(h.date).toUTCString()}</p>
+        <p>${h.body}</p>
+        ${h.source_url ? `<a class="read-more" href="${h.source_url}" target="_blank" rel="noopener">Read full story →</a>` : ""}
+      </article>`;
+
+    // Archive cards (remaining)
+    const archiveEl = document.getElementById("archive");
+    feed.slice(1).forEach(a => {
+      const card = document.createElement("article");
+      card.className = "card";
+      card.innerHTML = `
+        ${a.image ? `<img src="${a.image}" alt="${a.headline}">` : ""}
+        <h3>${a.headline}</h3>
+        <p class="meta">${fmt(a.date)}</p>
+        <p>${a.body.split(" ").slice(0,30).join(" ")}…</p>
+        ${a.source_url ? `<a class="read-more" href="${a.source_url}" target="_blank" rel="noopener">Read more →</a>` : ""}`;
+      archiveEl.appendChild(card);
+    });
+  }
+
+  loadFeed();
+</script>
+</body>
+</html>
