@@ -1,4 +1,4 @@
-anthropic>=0.25.0
+google-generativeai
 openai>=1.30.0
 tweepy>=4.14.0
 feedparser>=6.0.11
