@@ -1,0 +1,38 @@
+{
+  "run_time": "2026-05-13T16:25:50.251641+00:00",
+  "status": "completed",
+  "story": {
+    "source": "BBC",
+    "title": "Trump arrives in China for high-stakes meeting with Xi Jinping",
+    "summary": "The leaders of the global superpowers are expected to discuss the war in Iran, tariffs, AI and Taiwan during the two-day visit.",
+    "url": "https://www.bbc.com/news/articles/c1w28qw1e0xo?at_medium=RSS&at_campaign=rss",
+    "published": "2026-05-13T16:20:17",
+    "image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/d565/live/0c9f5810-4ee6-11f1-88a2-2b60a3feece0.jpg",
+    "priority_score": 4,
+    "selection_reason": "The meeting between Trump and Xi has the potential to impact global trade, technology, and geopolitical relationships, making it the most globally significant story."
+  },
+  "people": [
+    "Donald Trump",
+    "Xi Jinping"
+  ],
+  "image_path": "output/images/news_20260513_rss.jpg",
+  "posts": {
+    "twitter": {
+      "status": "error",
+      "error": "402 Payment Required\nYour enrolled account [2053918719672274944] does not have any credits to fulfill this request."
+    },
+    "facebook": {
+      "status": "error",
+      "error": "400 Client Error: Bad Request for url: https://graph.facebook.com/v19.0/112474983564023/photos"
+    },
+    "tiktok": {
+      "status": "skipped",
+      "reason": "not configured"
+    },
+    "website": {
+      "status": "success",
+      "entries": 2
+    },
+    "timestamp": "2026-05-13T16:25:55.486949+00:00"
+  }
+}
