@@ -1,0 +1,38 @@
+{
+  "run_time": "2026-05-13T23:39:40.424967+00:00",
+  "status": "completed",
+  "story": {
+    "source": "BBC",
+    "title": "Trade, Iran and Taiwan on the agenda as Trump arrives in China for high-stakes talks with Xi",
+    "summary": "The US president says his first request to Xi would be to  \"open up\" China, while Beijing is expected to press Trump on the status of Taiwan.",
+    "url": "https://www.bbc.com/news/articles/c1w28qw1e0xo?at_medium=RSS&at_campaign=rss",
+    "published": "2026-05-13T17:00:12",
+    "image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/d565/live/0c9f5810-4ee6-11f1-88a2-2b60a3feece0.jpg",
+    "priority_score": 4,
+    "selection_reason": "The meeting between Trump and Xi has significant implications for global trade, security, and diplomacy, affecting multiple countries and regions."
+  },
+  "people": [
+    "Donald Trump",
+    "Xi Jinping"
+  ],
+  "image_path": "output/images/news_20260513_rss.jpg",
+  "posts": {
+    "twitter": {
+      "status": "error",
+      "error": "402 Payment Required\nYour enrolled account [2053918719672274944] does not have any credits to fulfill this request."
+    },
+    "facebook": {
+      "status": "success",
+      "post_id": "112474983564023_1295105036098703"
+    },
+    "tiktok": {
+      "status": "skipped",
+      "reason": "not configured"
+    },
+    "website": {
+      "status": "success",
+      "entries": 4
+    },
+    "timestamp": "2026-05-13T23:39:49.320900+00:00"
+  }
+}
