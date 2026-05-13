@@ -3,7 +3,7 @@ image_handler.py
 Strategy:
   1. RSS thumbnail from the article
   2. Fallback: Google Custom Search Images (free tier)
-  3. Save locally for uploading to social platforms
+  3. Fallback: Download a free placeholder image (never crashes)
 """
 
 import os
@@ -16,6 +16,9 @@ OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
 
 GOOGLE_API_KEY = os.environ.get("GOOGLE_API_KEY", "")
 GOOGLE_CX      = os.environ.get("GOOGLE_CX", "")
+
+# Free placeholder image (no API key needed)
+PLACEHOLDER_URL = "https://placehold.co/1200x630/1a1a2e/ffffff.jpg?text=AI+News+Bot"
 
 
 def search_google_image(query: str, filename: str = "news_image.jpg") -> str | None:
@@ -59,6 +62,20 @@ def download_rss_thumbnail(url: str, filename: str = "news_image.jpg") -> str | 
         return None
 
 
+def download_placeholder(filename: str = "placeholder.jpg") -> str:
+    """Always works — returns a simple placeholder image."""
+    try:
+        print("[IMG] Using placeholder image …")
+        return _download_image(PLACEHOLDER_URL, filename)
+    except Exception as e:
+        print(f"[WARN] Placeholder download failed: {e}")
+        # Last resort: create a tiny blank file so bot never crashes
+        dest = OUTPUT_DIR / filename
+        dest.write_bytes(b"")
+        print(f"[IMG] Created empty fallback → {dest}")
+        return str(dest)
+
+
 def get_news_image(
     dalle_prompt: str,
     google_query: str,
@@ -67,17 +84,19 @@ def get_news_image(
 ) -> str:
     safe_name = re.sub(r"[^\w]", "_", filename)[:40]
 
-    # 1. RSS thumbnail (free)
+    # 1. RSS thumbnail (free, fastest)
     path = download_rss_thumbnail(rss_thumbnail_url, f"{safe_name}_rss.jpg")
     if path:
         return path
 
-    # 2. Google Images (free tier)
+    # 2. Google Images (free tier, optional)
     path = search_google_image(google_query, f"{safe_name}_google.jpg")
     if path:
         return path
 
-    raise RuntimeError("No image found — check RSS feed or Google API keys.")
+    # 3. Placeholder — never crashes the bot
+    print("[IMG] All image sources failed — using placeholder.")
+    return download_placeholder(f"{safe_name}_placeholder.jpg")
 
 
 def _download_image(url: str, filename: str) -> str:
