@@ -34,10 +34,8 @@ jobs:
       # ── 3. Run the bot ────────────────────────────────────────────────────
       - name: 🚀 Run AI News Bot
         env:
-          # Anthropic (Claude)
-          ANTHROPIC_API_KEY:        ${{ secrets.ANTHROPIC_API_KEY }}
-          # OpenAI (DALL-E)
-          OPENAI_API_KEY:           ${{ secrets.OPENAI_API_KEY }}
+          # Google Gemini
+          GEMINI_API_KEY:       ${{ secrets.GEMINI_API_KEY }}
           # Twitter / X
           TWITTER_API_KEY:          ${{ secrets.TWITTER_API_KEY }}
           TWITTER_API_SECRET:       ${{ secrets.TWITTER_API_SECRET }}
