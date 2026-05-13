@@ -13,7 +13,7 @@ import os
 from typing import Dict, List
 
 genai.configure(api_key=os.environ["GEMINI_API_KEY"])
-MODEL = "gemini-2.0-flash"
+MODEL = "gemini-1.5-flash"
 
 
 def _call_gemini(prompt: str, max_tokens: int = 800) -> str:
