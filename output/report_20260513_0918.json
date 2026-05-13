@@ -1,0 +1,38 @@
+{
+  "run_time": "2026-05-13T09:18:47.966020+00:00",
+  "status": "completed",
+  "story": {
+    "source": "Al Jazeera",
+    "title": "Trump and Xi to meet in Beijing: The key issues shaping the China summit",
+    "summary": "Trump and Xi meet as trade, Taiwan and the Iran war dominate a high-stakes US-China summit.",
+    "url": "https://www.aljazeera.com/economy/2026/5/13/trump-and-xi-to-meet-in-beijing-the-key-issues-shaping-the-china-summit?traffic_source=rss",
+    "published": "2026-05-13T07:08:18",
+    "image_url": "",
+    "priority_score": 4,
+    "selection_reason": "The meeting between Trump and Xi has the potential to impact global trade, geopolitics, and international relations, making it the most globally significant and high-impact story."
+  },
+  "people": [
+    "Donald Trump",
+    "Xi Jinping"
+  ],
+  "image_path": "output/images/news_20260513_placeholder.jpg",
+  "posts": {
+    "twitter": {
+      "status": "error",
+      "error": "402 Payment Required\nYour enrolled account [2053918719672274944] does not have any credits to fulfill this request."
+    },
+    "facebook": {
+      "status": "error",
+      "error": "400 Client Error: Bad Request for url: https://graph.facebook.com/v19.0//photos"
+    },
+    "tiktok": {
+      "status": "skipped",
+      "reason": "not configured"
+    },
+    "website": {
+      "status": "success",
+      "entries": 1
+    },
+    "timestamp": "2026-05-13T09:18:53.662371+00:00"
+  }
+}
