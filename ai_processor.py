@@ -77,20 +77,23 @@ def generate_captions(story: Dict, people: List[str]) -> Dict[str, str]:
 
     prompt = f"""You are a professional news writer. Write captions for this story in the style of BBC / Reuters.
 
-Keep language clear, factual, and impactful.
+IMPORTANT RULES:
+- Do NOT include any source credit like "Credit: BBC" or "Source:" anywhere
+- Do NOT mention where the story came from
+- Write as if you are the original news publisher
+- Keep language clear, factual, and impactful
 
 STORY TITLE: {story['title']}
 STORY SUMMARY: {story['summary']}
 KEY PEOPLE: {people_str}
-SOURCE: {story['source']}
 
 Return ONLY valid JSON with these five keys:
 
 {{
   "twitter": "<max 240 chars, punchy, 2-3 relevant hashtags>",
-  "facebook": "<2-3 sentences, informative, no hashtags, ends with source credit>",
+  "facebook": "<2-3 sentences, informative, factual, no hashtags, no source credit>",
   "tiktok": "<hook in first line, casual but factual, 3-4 lines, 2 hashtags>",
-  "website": "<headline (Title Case)>\\n\\n<3-4 sentence article intro, journalistic style>",
+  "website": "<headline (Title Case)>\\n\\n<3-4 sentence article intro, journalistic style, no source credit>",
   "image_prompt": "<detailed image prompt: realistic editorial photo style showing {people_str} in context of this news event>"
 }}"""
 
