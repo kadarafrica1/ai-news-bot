@@ -1,0 +1,38 @@
+{
+  "run_time": "2026-05-14T08:26:43.290030+00:00",
+  "status": "completed",
+  "story": {
+    "source": "Al Jazeera",
+    "title": "Iran war day 76: Vance says progress made in talks; Israel pounds Lebanon",
+    "summary": "US Vice President Vance says progress is being made in talks with Iran as President Trump begins his trip to China.",
+    "url": "https://www.aljazeera.com/news/2026/5/14/iran-war-day-76-vance-says-progress-made-in-talks-israel-pounds-lebanon?traffic_source=rss",
+    "published": "2026-05-14T07:00:12",
+    "image_url": "",
+    "priority_score": 6,
+    "selection_reason": "The story about progress in US-Iran talks and Israel pounding Lebanon has significant implications for global security and stability."
+  },
+  "people": [
+    "Vance",
+    "Donald Trump"
+  ],
+  "image_path": "output/images/news_20260514_placeholder.jpg",
+  "posts": {
+    "twitter": {
+      "status": "error",
+      "error": "402 Payment Required\nYour enrolled account [2053918719672274944] does not have any credits to fulfill this request."
+    },
+    "facebook": {
+      "status": "error",
+      "error": "403 Client Error: Forbidden for url: https://graph.facebook.com/v19.0/1089857260884109/photos"
+    },
+    "tiktok": {
+      "status": "skipped",
+      "reason": "not configured"
+    },
+    "website": {
+      "status": "success",
+      "entries": 5
+    },
+    "timestamp": "2026-05-14T08:26:49.189054+00:00"
+  }
+}
