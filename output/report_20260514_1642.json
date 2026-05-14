@@ -1,0 +1,35 @@
+{
+  "run_time": "2026-05-14T16:42:31.506693+00:00",
+  "status": "completed",
+  "story": {
+    "source": "BBC",
+    "title": "Ukraine rescuers pull dead from rubble of Kyiv flats after massive Russian strikes",
+    "summary": "A girl is among at least eight killed in Ukraine's capital in massive Russian drone and missile attacks, officials say.",
+    "url": "https://www.bbc.com/news/articles/cq5p8yygq94o?at_medium=RSS&at_campaign=rss",
+    "published": "2026-05-14T13:16:32",
+    "image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/d41b/live/7ad75e60-4fac-11f1-b682-cf91850925ea.jpg",
+    "priority_score": 5,
+    "selection_reason": "The story about Ukraine rescuers pulling dead from rubble of Kyiv flats after massive Russian strikes has significant global implications due to the ongoing conflict between Ukraine and Russia."
+  },
+  "people": [],
+  "image_path": "output/images/news_20260514_rss.jpg",
+  "posts": {
+    "twitter": {
+      "status": "error",
+      "error": "402 Payment Required\nYour enrolled account [2053918719672274944] does not have any credits to fulfill this request."
+    },
+    "facebook": {
+      "status": "success",
+      "post_id": "1089857260884109_122094554979328370"
+    },
+    "tiktok": {
+      "status": "skipped",
+      "reason": "not configured"
+    },
+    "website": {
+      "status": "success",
+      "entries": 9
+    },
+    "timestamp": "2026-05-14T16:42:41.865801+00:00"
+  }
+}
