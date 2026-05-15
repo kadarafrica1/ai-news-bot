@@ -1,0 +1,38 @@
+{
+  "run_time": "2026-05-15T23:15:38.548780+00:00",
+  "status": "completed",
+  "story": {
+    "source": "BBC",
+    "title": "Trump warns Taiwan against declaring independence, hours after summit with China's Xi",
+    "summary": "The US president says he wants Beijing and Taipei to \"cool down\" tensions over the self-governing island.",
+    "url": "https://www.bbc.com/news/articles/ce8p61v7l68o?at_medium=RSS&at_campaign=rss",
+    "published": "2026-05-15T21:28:25",
+    "image_url": "https://ichef.bbci.co.uk/ace/standard/240/cpsprodpb/fc97/live/44d90680-5077-11f1-8b8c-6d33e1d5abb6.jpg",
+    "priority_score": 4,
+    "selection_reason": "The story about Trump warning Taiwan against declaring independence has significant implications for global geopolitics and international relations between the US, China, and Taiwan."
+  },
+  "people": [
+    "Donald Trump",
+    "Xi Jinping"
+  ],
+  "image_path": "output/images/news_20260515_rss.jpg",
+  "posts": {
+    "twitter": {
+      "status": "error",
+      "error": "402 Payment Required\nYour enrolled account [2053918719672274944] does not have any credits to fulfill this request."
+    },
+    "facebook": {
+      "status": "success",
+      "post_id": "1089857260884109_122095578375328370"
+    },
+    "tiktok": {
+      "status": "skipped",
+      "reason": "not configured"
+    },
+    "website": {
+      "status": "success",
+      "entries": 11
+    },
+    "timestamp": "2026-05-15T23:15:46.944520+00:00"
+  }
+}
