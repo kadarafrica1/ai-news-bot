@@ -30,8 +30,8 @@ def _call_groq(prompt: str, max_tokens: int = 800) -> str:
 def _fix_json_string(raw: str) -> str:
     """
     Fix common JSON issues from LLM responses:
-    - Smart quotes → standard quotes
-    - Unescaped double quotes inside string values → escaped
+    - Smart quotes â†’ standard quotes
+    - Unescaped double quotes inside string values â†’ escaped
     - Trailing commas
     """
     # Strip markdown fences
@@ -90,7 +90,7 @@ def _safe_json(raw: str) -> dict | list:
         except json.JSONDecodeError:
             pass
 
-    # Step 4: Use json5-style lenient parsing — replace all inner quotes
+    # Step 4: Use json5-style lenient parsing â€” replace all inner quotes
     # Find JSON object, then sanitize each value
     try:
         # Remove all double quotes inside values by finding key-value pairs
@@ -176,15 +176,15 @@ Return this exact JSON structure:
 
 
 def process_news(articles: List[Dict]) -> Dict:
-    print("[AI] Selecting top story …")
+    print("[AI] Selecting top story â€¦")
     story = select_top_story(articles)
     print(f"[AI] Selected: {story['title']}")
 
-    print("[AI] Extracting key people …")
+    print("[AI] Extracting key people â€¦")
     people = extract_key_people(story)
     print(f"[AI] People: {people}")
 
-    print("[AI] Generating captions …")
+    print("[AI] Generating captions â€¦")
     captions = generate_captions(story, people)
 
     return {
