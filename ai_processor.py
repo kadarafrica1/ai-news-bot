@@ -4,7 +4,7 @@ ai_processor.py
 Uses Groq AI to:
 1. Pick the single most newsworthy story.
 2. Identify the key person(s) involved.
-3. Write platform-specific captions in journalistic style.
+3. Write platform-specific captions — each one separately to avoid JSON issues.
 """
 
 import json
@@ -17,7 +17,8 @@ client = Groq(api_key=os.environ["GROQ_API_KEY"])
 MODEL = "llama-3.3-70b-versatile"
 
 
-def _call_groq(prompt: str, max_tokens: int = 800) -> str:
+def _call_groq(prompt: str, max_tokens: int = 400) -> str:
+    """Call Groq and return plain text response."""
     response = client.chat.completions.create(
         model=MODEL,
         max_tokens=max_tokens,
@@ -27,88 +28,30 @@ def _call_groq(prompt: str, max_tokens: int = 800) -> str:
     return response.choices[0].message.content.strip()
 
 
-def _fix_json_string(raw: str) -> str:
+def _call_groq_json(prompt: str, max_tokens: int = 200) -> dict | list:
     """
-    Fix common JSON issues from LLM responses:
-    - Smart quotes â†’ standard quotes
-    - Unescaped double quotes inside string values â†’ escaped
-    - Trailing commas
+    Call Groq expecting SIMPLE JSON only (no hashtags, no quotes inside values).
+    Used only for select_top_story and extract_key_people.
     """
+    raw = _call_groq(prompt, max_tokens)
     # Strip markdown fences
     raw = re.sub(r"```json|```", "", raw).strip()
-
-    # Replace smart/curly quotes
-    raw = raw.replace("\u201c", '\\"').replace("\u201d", '\\"')
-    raw = raw.replace("\u2018", "'").replace("\u2019", "'")
-
-    # Fix unescaped double quotes inside JSON string values
-    # Strategy: find each "key": "value" pair and escape inner quotes
-    def escape_value(m):
-        key = m.group(1)
-        val = m.group(2)
-        # Escape any unescaped double quotes inside the value
-        val = re.sub(r'(?<!\\)"', '\\"', val)
-        return f'"{key}": "{val}"'
-
-    # Apply to each key-value pair (handles multi-line values too)
-    raw = re.sub(
-        r'"(\w+)":\s*"((?:[^"\\]|\\.)*)"',
-        escape_value,
-        raw,
-        flags=re.DOTALL,
-    )
-
-    # Remove trailing commas before } or ]
-    raw = re.sub(r",\s*([}\]])", r"\1", raw)
-
-    return raw
-
-
-def _safe_json(raw: str) -> dict | list:
-    """Robustly extract and parse JSON from Groq response."""
-
-    # Step 1: Try direct parse after basic cleanup
-    cleaned = re.sub(r"```json|```", "", raw).strip()
+    # Extract first { } or [ ] block
+    for pattern in (r"\{[^{}]*\}", r"\[[^\[\]]*\]"):
+        match = re.search(pattern, raw, re.DOTALL)
+        if match:
+            try:
+                return json.loads(match.group())
+            except json.JSONDecodeError:
+                pass
+    # Try full raw
     try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        pass
+        return json.loads(raw)
+    except json.JSONDecodeError as e:
+        raise ValueError(f"JSON parse failed: {e}\nRaw: {raw[:300]}") from e
 
-    # Step 2: Apply aggressive string fixing
-    try:
-        fixed = _fix_json_string(raw)
-        return json.loads(fixed)
-    except json.JSONDecodeError:
-        pass
 
-    # Step 3: Extract first {...} block and fix it
-    match = re.search(r"\{[\s\S]*\}", cleaned)
-    if match:
-        try:
-            block = _fix_json_string(match.group())
-            return json.loads(block)
-        except json.JSONDecodeError:
-            pass
-
-    # Step 4: Use json5-style lenient parsing â€” replace all inner quotes
-    # Find JSON object, then sanitize each value
-    try:
-        # Remove all double quotes inside values by finding key-value pairs
-        sanitized = re.sub(
-            r'("(?:twitter|facebook|tiktok|website|image_prompt|reason)":\s*")([^"]*(?:"[^"]*"[^"]*)*?)(")',
-            lambda m: m.group(1) + m.group(2).replace('"', "'") + m.group(3),
-            cleaned,
-            flags=re.DOTALL,
-        )
-        return json.loads(sanitized)
-    except Exception:
-        pass
-
-    raise ValueError(
-        f"Could not parse JSON after all attempts.\n"
-        f"Raw (first 400 chars):\n{raw[:400]}"
-    )
-
+# ── Story selection ───────────────────────────────────────────────────────────
 
 def select_top_story(articles: List[Dict]) -> Dict:
     articles_text = "\n\n".join(
@@ -116,80 +59,136 @@ def select_top_story(articles: List[Dict]) -> Dict:
         f"SUMMARY: {a['summary']}\nURL: {a['url']}"
         for i, a in enumerate(articles)
     )
-
     prompt = f"""You are a senior news editor. Below are today's top candidate stories.
 
 {articles_text}
 
 Pick the SINGLE most globally significant story.
+Reply ONLY with this exact JSON, no extra text, no markdown:
+{{"selected_index": 1, "reason": "one sentence"}}"""
 
-Reply ONLY with this exact JSON format, no extra text:
-{{"selected_index": 1, "reason": "one sentence here"}}"""
-
-    raw = _call_groq(prompt, max_tokens=150)
-    data = _safe_json(raw)
-    story = articles[data["selected_index"] - 1]
-    story["selection_reason"] = data["reason"]
+    data = _call_groq_json(prompt, max_tokens=150)
+    story = articles[int(data["selected_index"]) - 1]
+    story["selection_reason"] = data.get("reason", "")
     return story
 
 
 def extract_key_people(story: Dict) -> List[str]:
     prompt = f"""List the 1-3 most prominent real people in this news story.
-
 Reply ONLY with a JSON array like: ["Full Name", "Full Name"]
 If none, reply: []
+No markdown, no explanation.
 
 TITLE: {story['title']}
 SUMMARY: {story['summary']}"""
 
-    raw = _call_groq(prompt, max_tokens=80)
-    names = _safe_json(raw)
+    names = _call_groq_json(prompt, max_tokens=80)
     return names if isinstance(names, list) else []
 
 
-def generate_captions(story: Dict, people: List[str]) -> Dict[str, str]:
-    people_str = ", ".join(people) if people else "key figures"
+# ── Caption generation — each platform separately ────────────────────────────
 
-    prompt = f"""You are a professional news writer. Create social media captions.
-
-CRITICAL JSON RULES:
-- Return ONLY the JSON object, nothing else
-- Use ONLY escaped quotes inside strings: use \\\" never raw "
-- Instead of quoting someone, paraphrase them (no inner quotes needed)
-- Do NOT include source credits like Credit: BBC
+def _gen_twitter(story: Dict, people_str: str) -> str:
+    prompt = f"""Write a Twitter/X post about this news story.
+- Max 220 characters (leave room for hashtags)
+- Add 2-3 relevant hashtags at the end
+- Factual and punchy
+- NO source credit
 
 STORY: {story['title']}
 SUMMARY: {story['summary']}
 PEOPLE: {people_str}
 
-Return this exact JSON structure:
-{{
-  "twitter": "max 240 chars tweet with 2-3 hashtags",
-  "facebook": "2-3 sentence factual post no hashtags",
-  "tiktok": "short hook first line then 3 lines then 2 hashtags",
-  "website": "Title Case Headline\\n\\n3-4 sentence article intro",
-  "image_prompt": "detailed editorial photo prompt"
-}}"""
+Reply with ONLY the tweet text, nothing else."""
+    return _call_groq(prompt, max_tokens=120)
 
-    raw = _call_groq(prompt, max_tokens=900)
-    return _safe_json(raw)
 
+def _gen_facebook(story: Dict, people_str: str) -> str:
+    prompt = f"""Write a Facebook post about this news story.
+- 2-3 sentences
+- Factual and informative
+- NO hashtags
+- NO source credit like "Credit: BBC"
+
+STORY: {story['title']}
+SUMMARY: {story['summary']}
+PEOPLE: {people_str}
+
+Reply with ONLY the Facebook post text, nothing else."""
+    return _call_groq(prompt, max_tokens=150)
+
+
+def _gen_tiktok(story: Dict, people_str: str) -> str:
+    prompt = f"""Write a TikTok caption about this news story.
+- Hook sentence first
+- 3-4 short lines total
+- Casual but factual
+- 2 hashtags at end
+
+STORY: {story['title']}
+SUMMARY: {story['summary']}
+
+Reply with ONLY the TikTok caption, nothing else."""
+    return _call_groq(prompt, max_tokens=120)
+
+
+def _gen_website(story: Dict, people_str: str) -> str:
+    prompt = f"""Write a news article opening for this story.
+- First line: Title Case headline
+- Empty line
+- Then 3-4 sentence journalistic intro paragraph
+- NO source credit
+
+STORY: {story['title']}
+SUMMARY: {story['summary']}
+PEOPLE: {people_str}
+
+Reply with ONLY the headline and intro, nothing else."""
+    return _call_groq(prompt, max_tokens=200)
+
+
+def _gen_image_prompt(story: Dict, people_str: str) -> str:
+    prompt = f"""Write a image generation prompt for this news story.
+- Realistic editorial photo style
+- Show {people_str} in context of the event
+- 1-2 sentences only
+
+STORY: {story['title']}
+
+Reply with ONLY the image prompt, nothing else."""
+    return _call_groq(prompt, max_tokens=80)
+
+
+def generate_captions(story: Dict, people: List[str]) -> Dict[str, str]:
+    """Generate each caption separately — no JSON parsing issues."""
+    people_str = ", ".join(people) if people else "key figures"
+
+    return {
+        "twitter":      _gen_twitter(story, people_str),
+        "facebook":     _gen_facebook(story, people_str),
+        "tiktok":       _gen_tiktok(story, people_str),
+        "website":      _gen_website(story, people_str),
+        "image_prompt": _gen_image_prompt(story, people_str),
+    }
+
+
+# ── Main pipeline ─────────────────────────────────────────────────────────────
 
 def process_news(articles: List[Dict]) -> Dict:
-    print("[AI] Selecting top story â€¦")
+    print("[AI] Selecting top story …")
     story = select_top_story(articles)
     print(f"[AI] Selected: {story['title']}")
 
-    print("[AI] Extracting key people â€¦")
+    print("[AI] Extracting key people …")
     people = extract_key_people(story)
     print(f"[AI] People: {people}")
 
-    print("[AI] Generating captions â€¦")
+    print("[AI] Generating captions …")
     captions = generate_captions(story, people)
 
     return {
-        "story": story,
-        "people": people,
+        "story":    story,
+        "people":   people,
         "captions": captions,
     }
 
