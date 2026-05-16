@@ -2,15 +2,15 @@
 social_poster.py
 
 Posts the AI-generated news content to:
-• Twitter / X  (via Tweepy v4)        — Breaking News image overlay
-• Bluesky      (via atproto SDK)       — FREE, no payment needed
-• Facebook Page (via Graph API)        — high quality 1200x630 image
-• Website      (GitHub Pages JSON feed)
+• Twitter / X  (via Tweepy v4)     — Breaking News image overlay
+• Bluesky      (via atproto SDK)   — FREE, no payment needed
+• Facebook Page (via Graph API)    — high quality 1200x630 image
+
+NOTE: Website posting removed — will connect to Blogger separately.
+NOTE: No files are saved to GitHub repo after posting.
 """
 
 import os
-import json
-import time
 import requests
 import tweepy
 from datetime import datetime, timezone
@@ -28,28 +28,23 @@ FB_PAGE_ACCESS_TOKEN = os.environ.get("FACEBOOK_PAGE_ACCESS_TOKEN", "")
 BSKY_HANDLE          = os.environ.get("BLUESKY_HANDLE", "")
 BSKY_APP_PASSWORD    = os.environ.get("BLUESKY_APP_PASSWORD", "")
 
-WEBSITE_FEED_PATH = Path("output/website/feed.json")
-TARGET_W, TARGET_H = 1200, 630   # High quality standard
+TARGET_W, TARGET_H = 1200, 630
 
 
 # ── Image helpers ─────────────────────────────────────────────────────────────
 
-def _resize(image_path: str, suffix: str) -> str:
-    """Resize any image to 1200x630 high quality."""
+def prepare_facebook_image(image_path: str) -> str:
+    """Resize to 1200x630 high quality for Facebook."""
     try:
         img = Image.open(image_path).convert("RGB")
         img = img.resize((TARGET_W, TARGET_H), Image.LANCZOS)
-        out = image_path.replace(".jpg", f"_{suffix}.jpg")
+        out = image_path.replace(".jpg", "_fb.jpg")
         img.save(out, "JPEG", quality=95)
+        print("[IMG] Facebook image → 1200x630")
         return out
     except Exception as e:
-        print(f"[WARN] Resize failed: {e}")
+        print(f"[WARN] FB resize failed: {e}")
         return image_path
-
-
-def prepare_facebook_image(image_path: str) -> str:
-    print("[IMG] Preparing Facebook image 1200x630 …")
-    return _resize(image_path, "fb")
 
 
 def prepare_twitter_image(image_path: str, headline: str) -> str:
@@ -59,13 +54,12 @@ def prepare_twitter_image(image_path: str, headline: str) -> str:
         img = img.resize((TARGET_W, TARGET_H), Image.LANCZOS)
         draw = ImageDraw.Draw(img)
 
-        # Dark overlay strip at bottom
+        # Dark strip at bottom
         banner_h = 180
         banner_y = TARGET_H - banner_h
-        overlay = Image.new("RGB", (TARGET_W, banner_h), (0, 0, 0))
-        img.paste(overlay, (0, banner_y))
+        img.paste(Image.new("RGB", (TARGET_W, banner_h), (0, 0, 0)),
+                  (0, banner_y))
 
-        # Try to load fonts
         try:
             font_bold = ImageFont.truetype(
                 "/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf", 26)
@@ -97,7 +91,7 @@ def prepare_twitter_image(image_path: str, headline: str) -> str:
 
 
 def prepare_bluesky_image(image_path: str) -> str:
-    """Bluesky max blob size is ~976 KB — resize + compress."""
+    """Bluesky max blob ≈ 976 KB — resize + compress."""
     try:
         img = Image.open(image_path).convert("RGB")
         img = img.resize((1000, 525), Image.LANCZOS)
@@ -130,8 +124,7 @@ def post_twitter(caption: str, image_path: str, headline: str) -> dict:
                                     media_ids=[media.media_id])
         tweet_id = tweet.data["id"]
         print(f"[TWITTER] ✓ Tweet ID: {tweet_id}")
-        return {"status": "success", "tweet_id": tweet_id,
-                "url": f"https://twitter.com/i/web/status/{tweet_id}"}
+        return {"status": "success", "tweet_id": tweet_id}
     except Exception as e:
         print(f"[TWITTER] ✗ {e}")
         return {"status": "error", "error": str(e)}
@@ -152,7 +145,6 @@ def post_bluesky(caption: str, image_path: str, source_url: str) -> dict:
         with open(bsky_image, "rb") as f:
             img_data = f.read()
 
-        # Append source URL to caption (max 300 chars)
         text = caption[:260] + f"\n\n{source_url}"
         text = text[:300]
 
@@ -195,60 +187,16 @@ def post_facebook(caption: str, image_path: str) -> dict:
         return {"status": "error", "error": str(e)}
 
 
-# ── TikTok ────────────────────────────────────────────────────────────────────
-
-def post_tiktok(caption: str, image_path: str) -> dict:
-    print("[TIKTOK] Skipped — not configured.")
-    return {"status": "skipped", "reason": "not configured"}
-
-
-# ── Website ───────────────────────────────────────────────────────────────────
-
-def post_website(headline: str, body: str,
-                 image_path: str, source_url: str) -> dict:
-    print("[WEBSITE] Updating feed.json …")
-    try:
-        WEBSITE_FEED_PATH.parent.mkdir(parents=True, exist_ok=True)
-        existing = []
-        if WEBSITE_FEED_PATH.exists():
-            existing = json.loads(WEBSITE_FEED_PATH.read_text())
-
-        img_dest = WEBSITE_FEED_PATH.parent / "images" / Path(image_path).name
-        img_dest.parent.mkdir(parents=True, exist_ok=True)
-        img_dest.write_bytes(Path(image_path).read_bytes())
-
-        new_entry = {
-            "id": int(time.time()),
-            "date": datetime.now(timezone.utc).isoformat(),
-            "headline": headline,
-            "body": body,
-            "image": f"images/{img_dest.name}",
-            "source_url": source_url,
-        }
-        existing.insert(0, new_entry)
-        existing = existing[:30]
-        WEBSITE_FEED_PATH.write_text(
-            json.dumps(existing, indent=2, ensure_ascii=False))
-        print(f"[WEBSITE] ✓ feed.json updated ({len(existing)} entries)")
-        return {"status": "success", "entries": len(existing)}
-    except Exception as e:
-        print(f"[WEBSITE] ✗ {e}")
-        return {"status": "error", "error": str(e)}
-
-
 # ── Main ──────────────────────────────────────────────────────────────────────
 
 def post_all(captions: dict, image_path: str, source_url: str) -> dict:
-    website_parts = captions["website"].split("\n\n", 1)
+    website_parts = captions.get("website", captions.get("twitter", "")).split("\n\n", 1)
     headline = website_parts[0].strip()
-    body = website_parts[1].strip() if len(website_parts) > 1 else ""
 
     results = {
         "twitter":  post_twitter(captions["twitter"], image_path, headline),
         "bluesky":  post_bluesky(captions["twitter"], image_path, source_url),
         "facebook": post_facebook(captions["facebook"], image_path),
-        "tiktok":   post_tiktok(captions.get("tiktok", ""), image_path),
-        "website":  post_website(headline, body, image_path, source_url),
         "timestamp": datetime.now(timezone.utc).isoformat(),
     }
 
