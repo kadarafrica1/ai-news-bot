@@ -62,13 +62,15 @@ def run():
             " ".join(people[:2]) + " " + story["title"][:60]
             if people else story["title"][:80]
         )
+        
+        
+         # U beddel:
         image_path = get_news_image(
-            dalle_prompt      = captions.get("image_prompt", story["title"]),
-            google_query      = google_query,
-            rss_thumbnail_url = story.get("image_url", ""),
-            filename          = str(TEMP_DIR / f"news_{run_time.strftime('%Y%m%d')}"),
+            dalle_prompt=...,
+            google_query=...,
+            rss_thumbnail_url=article.get("image", ""),
+            article_url=article["url"],   # ← ku dar kan
         )
-
         # ── 4. Post ───────────────────────────────────────────────────────
         print("\n── Step 4: Posting to all platforms ──────────────────")
         post_results = post_all(captions, image_path, story["url"])
