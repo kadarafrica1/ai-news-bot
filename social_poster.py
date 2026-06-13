@@ -1,4 +1,4 @@
-   """
+"""
 social_poster.py
 Posts the AI-generated news content to:
 • Twitter / X       (via Tweepy v4)
